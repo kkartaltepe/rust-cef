@@ -1,7 +1,7 @@
 [package]
-name = "Rust-CEF"
+name = "rust_cef"
 version = "0.0.1"
 authors = [ "Kurt Kartaltepe <kkartaltepe@gmail.com>" ]
-
-[[bin]]
-name = "rust-cef"
+repository = "https://github.com/kkartaltepe/rust-cef"
+links = "cef"
+build = "build.rs"

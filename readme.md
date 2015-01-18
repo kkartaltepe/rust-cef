@@ -1,0 +1,1 @@
+This is a Rust wrapper around CEF for use in my ktime project since using C isnt very fun and interfacing with cef require me using msvc on windows. I'd rather learn a new language and wrap the multiplatform libcef.dll myself.
