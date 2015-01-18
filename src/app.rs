@@ -7,6 +7,7 @@ use std::default::Default;
 use std::mem;
 use std;
 
+//TODO: move to lib.rs somehow.
 #[link="cef"]
 extern "stdcall" {
 	fn cef_string_utf8_to_utf16(src: *const u8, src_len: size_t, cef_string: *mut CefString) -> c_int;
@@ -36,11 +37,7 @@ extern fn nop_app_ptr(ptr: *mut App) -> libc::c_int{
 
 impl Default for CefString {
 	fn default() -> Self {
-		return CefString {
-			str_ptr: std::ptr::null(),
-			length: 0,
-			dtor: nop_string
-		}
+		return CefString::empty();
 	}
 }
 
@@ -49,6 +46,14 @@ impl CefString {
 		let mut cef_string = CefString{..Default::default()};
 		unsafe { cef_string_utf8_to_utf16(string.as_ptr(), string.len() as size_t, &mut cef_string); }
 		return cef_string;
+	}
+
+	pub fn empty() -> CefString {
+		return CefString {
+			str_ptr: std::ptr::null(),
+			length: 0,
+			dtor: nop_string
+		}
 	}
 }
 
@@ -65,10 +70,7 @@ pub struct App {
 impl Default for App {
 	fn default() -> Self {
 		return App {
-			base: CefBase{
-				size: mem::size_of::<Self>() as size_t,
-				..Default::default()
-			},
+			base: CefBase::get::<App>(),
 			on_before_command_line_processing: nop_app,
 		    on_register_custom_schemes: nop_app,
 		    get_resource_bundle_handler: nop_app_ptr,
@@ -140,7 +142,7 @@ impl Default for Settings {
 			product_version: Default::default(),
 			locale: Default::default(),
 			log_file: Default::default(),
-			log_severity: 1, //Default, Verbose, Info, Warning, Error, 99=disabled
+			log_severity: 0, //Default, Verbose, Info, Warning, Error, 99=disabled
 			javascript: Default::default(),
 			reources_dir_path: Default::default(),
 			locales_dir_path: Default::default(),

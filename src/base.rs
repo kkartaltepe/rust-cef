@@ -24,8 +24,14 @@ pub struct CefBase {
 
 impl Default for CefBase {
 	fn default() -> Self {
+		return CefBase::get::<CefBase>();
+	}
+}
+
+impl CefBase {
+	pub fn get<T>() -> CefBase {
 		return CefBase {
-			size: mem::size_of::<Self>() as size_t,
+			size: mem::size_of::<T>() as size_t,
 			add_ref: nop_base,
 			release: nop_base_int,
 			has_one_ref: nop_base_int

@@ -7,7 +7,6 @@ use libc::types::common::c95::c_void;
 
 use std;
 use std::default::Default;
-use std::mem;
 
 #[repr(C)]
 pub struct WindowInfo {
@@ -31,11 +30,11 @@ impl Default for WindowInfo {
 		let WS_CLIPCHILDREN = 0x02000000u32;
 		let WS_CLIPSIBLINGS = 0x04000000u32;
 		let WS_VISIBLE = 0x10000000u32;
-		let WS_THINTITLEWINDOW =  0x00C00000u32 | 0x00080000u32 | 0x00040000u32 | 0x00010000u32 | 0x00020000u32; // 0x00080000;
-		let window_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE | WS_THINTITLEWINDOW;
+		let WS_TILEDWINDOW =  0x00C00000u32 | 0x00080000u32 | 0x00040000u32 | 0x00010000u32 | 0x00020000u32;
+		let window_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TILEDWINDOW;
 		return WindowInfo {
 				ex_style: 0u32,
-				window_name: Default::default(),
+				window_name: CefString::from("Rust CEF"),
 				style: window_style,
 				x: CW_USEDEFAULT,
 				y: CW_USEDEFAULT,
@@ -106,10 +105,7 @@ extern fn nop_processor (this: *mut Client, browser: libc::c_int, source_process
 impl Default for Client {
 	fn default() -> Self {
 		return Client {
-			base: CefBase {
-				size: (mem::size_of::<libc::c_int>()*19) as libc::size_t,
-				..Default::default()
-			},
+			base: CefBase::get::<Client>(),
 			get_context_menu_handler: nop_handler,
 			get_dialog_handler: nop_handler,
 			get_display_handler: nop_handler,
