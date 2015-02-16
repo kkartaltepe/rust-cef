@@ -6,7 +6,7 @@ use self::libc::size_t;
 use libc::types::common::c95::c_void;
 
 use std;
-use std::default::Default;
+use std::mem;
 
 #[repr(C)]
 pub struct WindowInfo {
@@ -23,9 +23,9 @@ pub struct WindowInfo {
 	transparent_painting_enabled: libc::c_int,
 	window: *const c_void
 }
-impl Default for WindowInfo {
+impl WindowInfo {
 	#[allow(non_snake_case)]
-	fn default() -> Self {
+	pub fn default() -> Self {
 		let CW_USEDEFAULT = 0x80000000u32;
 		let WS_CLIPCHILDREN = 0x02000000u32;
 		let WS_CLIPSIBLINGS = 0x04000000u32;
@@ -102,8 +102,8 @@ extern fn nop_processor (this: *mut Client, browser: libc::c_int, source_process
 	return 0;
 }
 
-impl Default for Client {
-	fn default() -> Self {
+impl Client {
+	pub fn default() -> Client {
 		return Client {
 			base: CefBase::get::<Client>(),
 			get_context_menu_handler: nop_handler,
@@ -133,14 +133,7 @@ enum CefState {
 	Disabled
 }
 
-impl Default for CefState {
-	fn default() -> CefState {
-		return CefState::Default;
-	}
-}
-
 #[repr(C)]
-#[derive(Default)]
 pub struct BrowserSettings {
 	size: size_t,
 	standard_font_family: CefString,
@@ -175,4 +168,44 @@ pub struct BrowserSettings {
 	application_cache: CefState,
 	webgl: CefState,
 	background_color: i32
+}
+
+impl BrowserSettings {
+    pub fn default() -> BrowserSettings {
+        return BrowserSettings {
+	        size: mem::size_of::<Self>() as size_t,
+	        standard_font_family: CefString::empty(),
+	        fixed_font_family: CefString::empty(),
+	        serif_font_family: CefString::empty(),
+	        sans_serif_font_family: CefString::empty(),
+	        cursive_font_family: CefString::empty(),
+	        fantasy_font_family: CefString::empty(),
+	        default_font_size: 0i32,
+	        default_fixed_font_size: 0i32,
+	        minimum_font_size: 0i32,
+	        minimum_logical_font_size: 0i32,
+	        default_encoding: CefString::empty(),
+	        remote_fonts: CefState::Default,
+	        javascript: CefState::Default,
+	        javascript_open_windows: CefState::Default,
+	        javascript_close_windows: CefState::Default,
+	        javascript_access_clipboard: CefState::Default,
+	        javascript_dom_paste: CefState::Default,
+	        caret_browsing: CefState::Default,
+	        java: CefState::Default,
+	        plugins: CefState::Default,
+	        universal_access_from_file_urls: CefState::Default,
+	        file_access_from_file_urls: CefState::Default,
+	        web_security: CefState::Default,
+	        image_loading: CefState::Default,
+	        image_shrink_standalone_to_fit: CefState::Default,
+	        text_area_resize: CefState::Default,
+	        tab_to_links: CefState::Default,
+	        local_storage: CefState::Default,
+	        databases: CefState::Default,
+	        application_cache: CefState::Default,
+	        webgl: CefState::Default,
+	        background_color: 0i32
+        }
+    }
 }

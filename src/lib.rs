@@ -1,7 +1,7 @@
 #![crate_type = "lib"]
 #![allow(dead_code)]
-#![allow(unstable)]
 #![allow(missing_copy_implementations)]
+#![feature(libc)]
 
 extern crate libc;
 use libc::c_int;
