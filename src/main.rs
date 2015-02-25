@@ -1,39 +1,37 @@
 #![crate_type = "bin"]
-#![feature(libc)]
+#![feature(libc,std_misc)]
 
 extern crate rust_cef;
 extern crate libc;
 
-use libc::types::os::arch::c95::wchar_t;
-use libc::types::common::c95::c_void;
-#[allow(unused_imports)]
-use libc::{c_int,c_uint};
-
-use rust_cef::app::{App, Settings, CefString, MainArgs};
-use rust_cef::browser::{WindowInfo, BrowserSettings, Client};
-
-#[link(name = "kernel32")]
-extern "stdcall" {
-    fn GetModuleHandleW(moduleName: *const wchar_t) -> *mut c_void;
-}
+use rust_cef::app::{App, Settings, CefString};
+use rust_cef::browser::{BrowserSettings, Client};
+use rust_cef::platform::linux::{MainArgs, WindowInfo};
 
 fn main() {
 	println!("Hello World");
-	let hinst = unsafe { GetModuleHandleW(std::ptr::null_mut()) };
 		
-	let args = MainArgs {instance: hinst};
+	let args = MainArgs::get();
 	let mut app = App::new();
+    check_args(args);
 
 	println!("Cef execute process");
 	let exec_ret = rust_cef::execute_process(&args, &mut app, std::ptr::null_mut());
+    println!("huh whats this? {} ", exec_ret);
 	if exec_ret >= 0 {
 		return;
 	}
 
 	let mut settings = Settings::default();
+	println!("Settings size is : {}", settings.size);
+	
 
 	println!("Cef initialize");
-	rust_cef::initialize(&args, &mut settings, &mut app);
+	let init_ret = rust_cef::initialize(&args, &mut settings, &mut app);
+	if init_ret != 1 {
+        println!("Init failed with {}", init_ret);
+        return;
+	}
 
 
 	let window_info = WindowInfo::default();
@@ -49,4 +47,17 @@ fn main() {
 
 	println!("Cef shutdown");
 	rust_cef::shutdown();	
+}
+
+fn check_args(args: MainArgs) {
+    println!("{} arguments to this thread", args.argc);
+    let argv_slice = unsafe { std::slice::from_raw_parts(args.argv, args.argc as usize) };
+    for &c_string_p in argv_slice {
+        unsafe {
+            let c_str = std::ffi::CStr::from_ptr(c_string_p);
+            let strslice = std::str::from_utf8(c_str.to_bytes()).unwrap();
+            println!("Argument: '{}'", strslice);
+        }
+    }
+
 }

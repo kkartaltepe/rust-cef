@@ -9,60 +9,6 @@ use std;
 use std::mem;
 
 #[repr(C)]
-pub struct WindowInfo {
-	ex_style: u32,
-	window_name: CefString,
-	style: u32,
-	x: u32,
-	y: u32,
-	width: u32,
-	height: u32,
-	parent_window: *const c_void,
-	menu: *const c_void,
-	windowless_rendering_enabled: libc::c_int,
-	transparent_painting_enabled: libc::c_int,
-	window: *const c_void
-}
-impl WindowInfo {
-	#[allow(non_snake_case)]
-	pub fn default() -> Self {
-		let CW_USEDEFAULT = 0x80000000u32;
-		let WS_CLIPCHILDREN = 0x02000000u32;
-		let WS_CLIPSIBLINGS = 0x04000000u32;
-		let WS_VISIBLE = 0x10000000u32;
-		let WS_TILEDWINDOW =  0x00C00000u32 | 0x00080000u32 | 0x00040000u32 | 0x00010000u32 | 0x00020000u32;
-		let window_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TILEDWINDOW;
-		return WindowInfo {
-				ex_style: 0u32,
-				window_name: CefString::from("Rust CEF"),
-				style: window_style,
-				x: CW_USEDEFAULT,
-				y: CW_USEDEFAULT,
-				width: CW_USEDEFAULT,
-				height: CW_USEDEFAULT,
-				parent_window: std::ptr::null(),
-				menu: std::ptr::null(),
-				windowless_rendering_enabled: 0i32,
-				transparent_painting_enabled: 0i32,
-				window: std::ptr::null()
-		}
-	}
-}
-
-
-#[repr(C)]
-struct WindowInfoLinux {
-	x: u32,
-	y: u32,
-	width: u32,
-	height: u32,
-	parent_window: libc::c_int,
-	windowless_rendering_enabled: libc::c_int,
-	transparent_painting_enabled: libc::c_int,
-	window: libc::c_int
-}
-
-#[repr(C)]
 struct ProcessMessage {
 	base: CefBase,
 	is_valid: extern fn(this: *mut ProcessMessage) -> i32,

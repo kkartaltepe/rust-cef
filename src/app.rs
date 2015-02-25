@@ -2,13 +2,18 @@ extern crate libc;
 
 use base::CefBase;
 use libc::{c_int, size_t};
-use libc::types::common::c95::c_void;
 use std::mem;
 use std;
 
 //TODO: move to lib.rs somehow.
+#[cfg(target_os = "windows")]
 #[link="cef"]
 extern "stdcall" {
+    fn cef_string_utf8_to_utf16(src: *const u8, src_len: size_t, cef_string: *mut CefString) -> c_int;
+}
+#[cfg(target_os = "linux")]
+#[link="cef"]
+extern "C" {
     fn cef_string_utf8_to_utf16(src: *const u8, src_len: size_t, cef_string: *mut CefString) -> c_int;
 }
 
@@ -47,7 +52,7 @@ impl CefString {
     pub fn from(string: &'static str) -> CefString {
         let mut cef_string  = CefString::empty();
         unsafe { cef_string_utf8_to_utf16(string.as_ptr(), string.len() as size_t, &mut cef_string); }
-            return cef_string;
+        return cef_string;
     }
 }
 
@@ -74,16 +79,6 @@ impl App {
     }
 }
 
-#[repr(C)]
-pub struct MainArgsLinux {
-    pub argc: libc::c_int,
-    pub argv: libc::c_int
-}
-
-#[repr(C)]
-pub struct MainArgs {
-    pub instance: *mut c_void
-}
 
 // To enable the sandbox on Windows the following requirements must be met:
 // 1. Use the same executable for the browser process and all sub-processes.
@@ -95,7 +90,7 @@ pub struct MainArgs {
 
 #[repr(C)]
 pub struct Settings {
-    size: size_t,
+    pub size: size_t,
     single_process: libc::c_int,
     pub no_sandbox: libc::c_int,
     browser_subprocess_path: CefString,
@@ -138,8 +133,8 @@ impl Settings {
             log_file: CefString::empty(),
             log_severity: 0, //Default, Verbose, Info, Warning, Error, 99=disabled
             javascript: CefString::empty(),
-            reources_dir_path: CefString::empty(),
-            locales_dir_path: CefString::empty(),
+            reources_dir_path: CefString::from("/home/kk/projects/CEF/resources"),
+            locales_dir_path: CefString::from("/home/kk/projects/CEF/resources/locales"),
             pack_loading_disabled: 0,
             remote_debugging_port: 0,
             uncaught_exception_stack_size: 0,

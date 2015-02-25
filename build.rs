@@ -1,12 +1,16 @@
-#![feature(env)]
-use std::env;
-use std::old_io::Command;
+#![feature(io)]
+use std::old_io::process::Command;
 
 fn main() {
-    let target = env::var("TARGET").unwrap();
-    let mut split = target.split('-');
-    let arch = split.next().unwrap();
-    let manufact = split.next().unwrap();
-    let os = split.next().unwrap();
-	println!("cargo:rustc-flags=-L ../CEF/lib/{}_{}", arch, os);
+    add_platform_flags();
+}
+
+#[cfg(target_os = "linux")]
+fn add_platform_flags() {
+    println!("cargo:rustc-flags=-L ../CEF/lib/x64_linux");
+}
+
+#[cfg(target_os = "windows")]
+fn add_platform_flags() {
+    println!("cargo:rustc-flags=-L ../CEF/lib/x64_windows");
 }
